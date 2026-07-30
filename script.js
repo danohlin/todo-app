@@ -1,6 +1,28 @@
 const form = document.getElementById('todo-form');
 const input = document.getElementById('todo-input');
 const list = document.getElementById('todo-list');
+const themeToggleButton = document.getElementById('theme-toggle');
+
+function setTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  const nextLabel = theme === 'dark' ? 'Light' : 'Dark';
+  themeToggleButton.textContent = nextLabel;
+  themeToggleButton.setAttribute('aria-label', `Switch to ${nextLabel.toLowerCase()} mode`);
+  localStorage.setItem('theme', theme);
+}
+
+function initializeTheme() {
+  const savedTheme = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  setTheme(savedTheme || (prefersDark ? 'dark' : 'light'));
+}
+
+themeToggleButton.addEventListener('click', () => {
+  const currentTheme = document.documentElement.dataset.theme;
+  setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+});
+
+initializeTheme();
 
 form.addEventListener('submit', (event) => {
   event.preventDefault();
