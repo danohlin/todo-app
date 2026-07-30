@@ -29,22 +29,76 @@ function createTodoItem(text) {
   const item = document.createElement('li');
   item.className = 'todo-item item-enter';
 
+  let currentText = text;
+
   const checkbox = document.createElement('input');
   checkbox.type = 'checkbox';
   checkbox.className = 'toggle';
-  checkbox.setAttribute('aria-label', `Mark ${text} complete`);
+  checkbox.setAttribute('aria-label', `Mark ${currentText} complete`);
   checkbox.addEventListener('change', () => {
     item.classList.toggle('completed', checkbox.checked);
   });
 
   const label = document.createElement('div');
   label.className = 'label';
-  label.textContent = text;
+  label.textContent = currentText;
+  label.title = 'Double-click to edit';
+
+  function updateAriaLabels() {
+    checkbox.setAttribute('aria-label', `Mark ${currentText} complete`);
+    editButton.setAttribute('aria-label', `Edit ${currentText}`);
+    deleteButton.setAttribute('aria-label', `Delete ${currentText}`);
+  }
+
+  function enterEditMode() {
+    const editInput = document.createElement('input');
+    editInput.type = 'text';
+    editInput.className = 'label-edit';
+    editInput.value = currentText;
+    label.replaceWith(editInput);
+    editInput.focus();
+    editInput.select();
+
+    function commit() {
+      const newText = editInput.value.trim();
+      if (newText) {
+        currentText = newText;
+        label.textContent = currentText;
+        updateAriaLabels();
+      }
+      editInput.replaceWith(label);
+    }
+
+    function cancel() {
+      editInput.replaceWith(label);
+    }
+
+    editInput.addEventListener('blur', commit);
+    editInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        editInput.blur();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        editInput.removeEventListener('blur', commit);
+        cancel();
+      }
+    });
+  }
+
+  label.addEventListener('dblclick', enterEditMode);
+
+  const editButton = document.createElement('button');
+  editButton.type = 'button';
+  editButton.className = 'item-edit';
+  editButton.setAttribute('aria-label', `Edit ${currentText}`);
+  editButton.innerHTML = '✎';
+  editButton.addEventListener('click', enterEditMode);
 
   const deleteButton = document.createElement('button');
   deleteButton.type = 'button';
   deleteButton.className = 'item-delete';
-  deleteButton.setAttribute('aria-label', `Delete ${text}`);
+  deleteButton.setAttribute('aria-label', `Delete ${currentText}`);
   deleteButton.innerHTML = '✕';
 
   deleteButton.addEventListener('click', () => {
@@ -55,6 +109,7 @@ function createTodoItem(text) {
 
   item.appendChild(checkbox);
   item.appendChild(label);
+  item.appendChild(editButton);
   item.appendChild(deleteButton);
 
   // remove enter class after animation completes

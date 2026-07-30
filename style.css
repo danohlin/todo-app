@@ -183,6 +183,7 @@ body {
   color: var(--muted);
 }
 
+.item-edit,
 .item-delete {
   border: none;
   background: transparent;
@@ -193,9 +194,34 @@ body {
   transition: transform 120ms ease, color 120ms ease;
 }
 
+.item-edit {
+  color: var(--muted);
+}
+
+.item-edit:hover {
+  transform: translateY(-2px);
+  color: var(--primary-600);
+}
+
 .item-delete:hover {
   transform: translateY(-2px);
   color: var(--danger);
+}
+
+.label-edit {
+  flex: 1 1 auto;
+  font-size: 15px;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid var(--primary-600);
+  border-radius: 8px;
+  padding: 2px 6px;
+  font-family: inherit;
+}
+
+.label-edit:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.15);
 }
 
 /* Enter animation */
