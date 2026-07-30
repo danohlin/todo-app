@@ -130,12 +130,18 @@ function createTodoItem(text, completed = false) {
   deleteButton.innerHTML = '✕';
 
   deleteButton.addEventListener('click', () => {
-    // play removal animation, then remove from DOM
-    item.classList.add('item-removing');
-    item.addEventListener('animationend', () => {
+    // play removal animation, then remove from DOM. Fall back to a timeout
+    // in case animationend never fires (e.g. animations disabled/skipped).
+    let removed = false;
+    const finishRemoval = () => {
+      if (removed) return;
+      removed = true;
       item.remove();
       saveTodos();
-    }, { once: true });
+    };
+    item.classList.add('item-removing');
+    item.addEventListener('animationend', finishRemoval, { once: true });
+    setTimeout(finishRemoval, 300);
   });
 
   item.appendChild(checkbox);
