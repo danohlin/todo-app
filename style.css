@@ -160,6 +160,14 @@ body {
   align-items: center;
 }
 
+.empty-state {
+  margin: 0;
+  padding: 24px 14px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 .todo-item:hover {
   transform: translateY(-4px);
   box-shadow: 0 14px 30px rgba(2,6,23,0.10);

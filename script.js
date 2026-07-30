@@ -1,6 +1,7 @@
 const form = document.getElementById('todo-form');
 const input = document.getElementById('todo-input');
 const list = document.getElementById('todo-list');
+const emptyState = document.getElementById('empty-state');
 const themeToggleButton = document.getElementById('theme-toggle');
 const themeLabel = themeToggleButton.querySelector('.theme-label');
 
@@ -27,12 +28,17 @@ initializeTheme();
 
 const TODOS_STORAGE_KEY = 'todos';
 
+function updateEmptyState() {
+  emptyState.hidden = list.children.length > 0;
+}
+
 function saveTodos() {
   const todos = Array.from(list.querySelectorAll('.todo-item')).map((item) => ({
     text: item.querySelector('.label').textContent,
     completed: item.classList.contains('completed'),
   }));
   localStorage.setItem(TODOS_STORAGE_KEY, JSON.stringify(todos));
+  updateEmptyState();
 }
 
 function loadTodos() {
@@ -47,6 +53,7 @@ function loadTodos() {
     item.classList.remove('item-enter');
     list.appendChild(item);
   });
+  updateEmptyState();
 }
 
 function createTodoItem(text, completed = false) {
