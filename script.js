@@ -25,18 +25,45 @@ themeToggleButton.addEventListener('click', () => {
 
 initializeTheme();
 
-function createTodoItem(text) {
+const TODOS_STORAGE_KEY = 'todos';
+
+function saveTodos() {
+  const todos = Array.from(list.querySelectorAll('.todo-item')).map((item) => ({
+    text: item.querySelector('.label').textContent,
+    completed: item.classList.contains('completed'),
+  }));
+  localStorage.setItem(TODOS_STORAGE_KEY, JSON.stringify(todos));
+}
+
+function loadTodos() {
+  let todos;
+  try {
+    todos = JSON.parse(localStorage.getItem(TODOS_STORAGE_KEY)) || [];
+  } catch {
+    todos = [];
+  }
+  todos.forEach(({ text, completed }) => {
+    const item = createTodoItem(text, completed);
+    item.classList.remove('item-enter');
+    list.appendChild(item);
+  });
+}
+
+function createTodoItem(text, completed = false) {
   const item = document.createElement('li');
   item.className = 'todo-item item-enter';
+  if (completed) item.classList.add('completed');
 
   let currentText = text;
 
   const checkbox = document.createElement('input');
   checkbox.type = 'checkbox';
   checkbox.className = 'toggle';
+  checkbox.checked = completed;
   checkbox.setAttribute('aria-label', `Mark ${currentText} complete`);
   checkbox.addEventListener('change', () => {
     item.classList.toggle('completed', checkbox.checked);
+    saveTodos();
   });
 
   const label = document.createElement('div');
@@ -65,6 +92,7 @@ function createTodoItem(text) {
         currentText = newText;
         label.textContent = currentText;
         updateAriaLabels();
+        saveTodos();
       }
       editInput.replaceWith(label);
     }
@@ -104,7 +132,10 @@ function createTodoItem(text) {
   deleteButton.addEventListener('click', () => {
     // play removal animation, then remove from DOM
     item.classList.add('item-removing');
-    item.addEventListener('animationend', () => item.remove(), { once: true });
+    item.addEventListener('animationend', () => {
+      item.remove();
+      saveTodos();
+    }, { once: true });
   });
 
   item.appendChild(checkbox);
@@ -128,6 +159,7 @@ form.addEventListener('submit', (event) => {
 
   const item = createTodoItem(text);
   list.appendChild(item);
+  saveTodos();
 
   input.value = '';
   input.focus();
@@ -140,3 +172,5 @@ input.addEventListener('keydown', (e) => {
     form.dispatchEvent(new Event('submit', { cancelable: true }));
   }
 });
+
+loadTodos();
